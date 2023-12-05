@@ -1,3 +1,5 @@
+(defglobal ?*plan_de_accion* = (create$))
+
 (defrule r1
     (paciente listo) 
     (paciente enQuirofano)
@@ -13,24 +15,28 @@
     => 
     (printout t "Puede comenzar la intervencion CirujanoJ" crlf)
     (assert (cirujanoJ comienzaIntervencion))
-    (retract ?fact1) )
+    (retract ?fact1)
+    (bind ?*plan_de_accion* (create$ "CirujanoJ comienza la intervencion"))
+)
 
 (defrule r2
     (cirujanoJ comienzaIntervencion)
     ?fact1 <- (anestesiologo listo)
     =>
-    (printout t " Anestesiólogo confirma el cálculo del anestésico y lo apliquelo al Paciente" crlf)
+    (printout t " Anestesiólogo confirma el cálculo del anestésico y lo aplica al Paciente" crlf)
     (assert (anestesiologo aplicandoAnestecia))
     (retract ?fact1)
-    )
+    (bind ?*plan_de_accion* (create$ ?*plan_de_accion* "Anestesiólogo aplica anestésico al Paciente"))
+)
 
 (defrule r3 
     (anestesiologo aplicandoAnestecia)
     ?fact1 <- (paciente listo)
     =>
-    (printout t "CirujanoJ el paciente esta sedado" crlf)
+    (printout t "CirujanoJ el paciente está sedado" crlf)
     (assert (paciente sedado))
     (retract ?fact1)
+    (bind ?*plan_de_accion* (create$ ?*plan_de_accion* "Paciente sedado"))
 )
 
 (defrule r4
@@ -40,13 +46,15 @@
     (printout t "Cirujano2 Comienza la intervencion" crlf)
     (assert (cirujano2 interviniendo))
     (retract ?fact1)
+    (bind ?*plan_de_accion* (create$ ?*plan_de_accion* "Cirujano2 comienza la intervencion"))
 )
 
 (defrule r5 
     (cirujano2 interviniendo)
     =>
-    (printout t "Cirujano2 solicitando istrumentos para la intervencion" crlf)
+    (printout t "Cirujano2 solicitando instrumentos para la intervencion" crlf)
     (assert (cirujano2 solicitandoInstrumentos))
+    (bind ?*plan_de_accion* (create$ ?*plan_de_accion* "Cirujano2 solicita instrumentos"))
 )
 
 (defrule r6
@@ -54,26 +62,26 @@
     (cirujano2 solicitandoInstrumentos)
     ?fact1 <- (enfermera listo)
     ?fact2 <- (cirujano2 solicitandoInstrumentos)
-    ?fact3 <- (enfermera libre)
     =>
     (printout t "Enfermera provee material e instrumentos" crlf)
-    (assert (enfermera gestinandoInstrumentos))
+    (assert (enfermera gestionandoInstrumentos))
     (retract ?fact1)
     (retract ?fact2)
-    (retract ?fact3)
+    (bind ?*plan_de_accion* (create$ ?*plan_de_accion* "Enfermera provee material e instrumentos"))
 )
 
 (defrule r7 
     (cirujano2 interviniendo)
-    (enfermera gestinandoInstrumentos)
+    (enfermera gestionandoInstrumentos)
     ?fact1 <- (cirujano2 interviniendo)
-    ?fact2 <- (enfermera gestinandoInstrumentos)
+    ?fact2 <- (enfermera gestionandoInstrumentos)
     =>
     (printout t "Intervencion realizada" crlf)
     (assert (cirujano2 finalizoIntervencion))
     (assert (enfermera libre))
     (retract ?fact1)
     (retract ?fact2)
+    (bind ?*plan_de_accion* (create$ ?*plan_de_accion* "Intervencion realizada"))
 )
 
 (defrule r8
@@ -81,6 +89,7 @@
     =>
     (printout t "CirujanoJ se ha realizado la intervencion" crlf)
     (assert (cirujanoJ notificado))
+    (bind ?*plan_de_accion* (create$ ?*plan_de_accion* "CirujanoJ notificado"))
 )
 
 (defrule r9
@@ -95,4 +104,6 @@
     (assert (paciente enSalaDeRecuperacion))
     (retract ?fact1)
     (retract ?fact2)
+    (bind ?*plan_de_accion* (create$ ?*plan_de_accion* "Enfermera lleva al paciente a la sala de recuperacion"))
 )
+

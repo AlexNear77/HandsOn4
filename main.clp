@@ -112,3 +112,6 @@
     (retract ?fact1)
     (retract ?fact2)
 )
+
+
+(printout t "Plan de accion:" ?*plan_de_accion* crlf)
